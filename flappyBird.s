@@ -216,10 +216,10 @@ addDown:
 # Takes none
 # Returns $2 = direction
 GetDir:
-		li $8, $0, 0xFFFF0004		# Load input value
+		addi $8, $0, 0xFFFF0004		# Load input value
 upPressed:
 		bne, $8, 119, GetDir_done
-		li $2, $0, 0x02000000		# Up was pressed
+		addi $2, $0, 0x02000000		# Up was pressed
 GetDir_done:
 		jr $31
 ###########################################################################################
