@@ -1,9 +1,13 @@
 .text
 
-#1 is start, 2 is color, 3 is row, 4 is col
+#------------------------------
+#1 VGA start address
+#
+#
+#------------------------------
 
 initializeVga:
-lw $1, vgaStart($0)
+lw $1, vgaStart($0)		#Load the beginning VGA addr into $1
 addi $5, $0, 480
 
 jal delay1S
