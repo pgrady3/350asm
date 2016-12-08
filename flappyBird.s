@@ -235,11 +235,13 @@ fillColor:
 fillColorLoop:
 		sw $a0, 0($a1)
 		add $a1, $a1, 4			# Add 4
-		blt $a1, $a2, fillColorLoop	# Keep looping until reached end
+		bne $a1, $a2, fillColorLoop	# Keep looping until reached end
 		jr $ra
 ###########################################################################################
 # Add bot wall
-AddBounds:
+AddBounds:	
+		move $t4, $ra			# Back up $ra 
+		
 		lw $t0, stageWidth		# Calculate final ending position
 		lw $t1, stageHeight
 		subi $t0, $t0, 1
@@ -261,7 +263,8 @@ AddBounds:
 		move $a1, $t3
 		lw $a2, playerColor
 		jal drawLineHoriz		# draw line from (0, stageHeight) to (stageWidth, stageHeight)
-
+		
+		move $ra, $t4
 		jr $ra
 ###########################################################################################
 # Draw horizontal line from $a0 to $a1 in color $a2
@@ -277,11 +280,13 @@ drawLineVert:
 		lw $a3, stageWidth		
 		sll $a3, $a3, 2			# stageWidth*4 stored in $a3
 		add $a0, $a0, $a3		# move to next pixel downwards
-		blt $a0, $a1, drawLineVert	# keep doing this until $a1
+		bne $a0, $a1, drawLineVert	# keep doing this until $a1
 		jr $ra
 ###########################################################################################
 # Draw the player given an address, $a0, of top left corner, in the color $a1
 drawPlayer:
+		move $t6, $ra			# back up $ra
+		
 		move $t0, $a0			# back up start address (top left coord)
 		move $t5, $a1			# back up color
 		lw $t1, playerSize
@@ -308,20 +313,22 @@ drawPlayer:
 		move $a0, $t2
 		move $a1, $t4
 		jal drawLineVert		# draw right line of player
-
+		
+		move $ra, $t6
 		jr $ra
 ###########################################################################################
 # Draw pipe from an address $a0 in top left corner with height $a1 in color $a2
 drawPipe:
+		move $t8, $ra 			# back up $ra
+		
 		move $t0, $a0			# Back up $a0-$a2 bc will call other functions
 		move $t1, $a1
-		move $t2, $a2
 		lw $t3, pipeWidth
 		sll $t3, $t3, 2			# pipeWidth*4 stored in $t3
 
 		lw $t4, pipeHeight
-		lw $t5, stageWidth
-		multu $t4, $t5
+		lw $t2, stageWidth
+		multu $t4, $t2
 		mflo $t4
 		sll $t4, $t4, 2			# pipeHeight*stageWidth*4 stored in $t4
 
@@ -340,8 +347,8 @@ drawPipe:
 		jal drawLineVert		# draw line from $t7 down to $t6
 
 		lw $t4, pipeGap
-		lw $t5, stageWidth
-		multu $t4, $t5
+		lw $t2, stageWidth
+		multu $t4, $t2
 		mflo $t4
 		sll $t4, $t4, 2 		# pipeGap*stageWidth*4 stored in $t4
 
@@ -366,7 +373,8 @@ drawPipe:
 		move $a0, $t7
 		move $a1, $t4
 		jal drawLineVert		# draw line from $t7 to $t4
-
+		
+		move $ra, $t8
 		jr $ra
 ###########################################################################################
 # Detects collision between bird and pipe
