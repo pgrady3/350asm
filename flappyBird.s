@@ -26,7 +26,7 @@ mainInit:
 			lw $5, playerY
 			jal coordToAddr		# Convert player position to address
 
-			move $16, $2		# Store player start position in $16
+			add $16, $0, $2		# Store player start position in $16
 
 			lw $20, defaultDir	# Store default dir in $20
 
@@ -35,38 +35,38 @@ mainInit:
 			lw $23, bgndColor	# Store background color in $23
 
 			# Prepare the arena
-			move $4, $23		# Fill stage with background color
+			add $4, $0, $23		# Fill stage with background color
 			jal fillColor
 			jal AddBounds		# Add walls
 
 			# Draw initial player
-			move $4, $16
+			add $4, $0, $16
 			jal drawPlayer
 
 			# Draw initial pipes
 			lw $4, pipeSpace	# start first pipe
-			move $5, $0
+			add $5, $0, $0
 			jal coordToAddr
 
-			move $17, $2		# Store address of first pipe
-			move $4, $17
+			add $17, $0, $2		# Store address of first pipe
+			add $4, $0, $17
 			lw $6, playerColor
 			jal drawPipe
 
 			lw $18, pipeSpace
 			sll $18, $18, 2
 			add $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, playerColor
 			jal drawPipe
 
 			add $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, playerColor
 			jal drawPipe
 
 			add $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, playerColor
 			jal drawPipe
 
@@ -80,30 +80,30 @@ mainGame:
 
 			# Update bird
 			jal GetDir		# Get direction from keyboard
-			move $20, $2		# $20 is direction from keyboard
-			move $4, $16 		# Load position
+			add $20, $0, $2		# $20 is direction from keyboard
+			add $4, $0, $16 		# Load position
 
-			# Move up or move down based on if button pressed
+			# Move up or add down based on if button pressed
 mainMoveUp:
 			bne, $20, 0x02000000, mainMoveDown
 			lw $5, boost
-			jal moveUp		# Up
+			jal addUp		# Up
 			j mainGameCtd
 
 mainMoveDown:
 			lw $5, gravity
-			jal moveDown		# Down
+			jal addDown		# Down
 
 mainGameCtd:
 
 			# erase old player position by retracing with background color
-			move $4, $16
+			add $4, $0, $16
 			lw $5, bgndColor
 			jal drawPlayer
 
 			# update player with new position
-			move $16, $2 		# Update address
-			move $4, $16
+			add $16, $0, $2 		# Update address
+			add $4, $0, $16
 			jal drawPlayer		# Update player's location on screen
 
 			# clear pipes by tracing them with background color
@@ -113,50 +113,50 @@ mainGameCtd:
 			lw $18, pipeSpace
 			sll $18, $18, 2
 			sub $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, bgndColor
 			jal drawPipe
 
 			sub $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, bgndColor
 			jal drawPipe
 
 			sub $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, bgndColor
 			jal drawPipe
 
 			# draw in updated pipes
-			move $4, $17
+			add $4, $0, $17
 			addi $5, $0, 1
-			jal moveLeft		# Move rightmost pipe left by 1 unit
+			jal addLeft		# Move rightmost pipe left by 1 unit
 
-			move $17, $2
-			move $4, $17
+			add $17, $0, $2
+			add $4, $0, $17
 			lw $6, playerColor
 			jal drawPipe		# Draw the leftmost pipe
 
 			lw $18, pipeSpace
 			sll $18, $18, 2
 			add $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, playerColor
 			jal drawPipe
 
 			add $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, playerColor
 			jal drawPipe
 
 			add $17, $17, $18	# Go to next pipe
-			move $4, $17
+			add $4, $0, $17
 			lw $6, playerColor
 			jal drawPipe
 
 			jal collisionDetect	# Check for collisions
 
-			#bnez $2, mainGameOver
+			#bne $2, $0, mainGameOver
 			b mainGame
 
 mainGameOver:
@@ -166,45 +166,45 @@ mainGameOver:
 # Get x,y coordinates stored in $4,$5 and returns pixel address in $2
 coordToAddr:
 		#address = 4*(x + y*width) + gp
-		move $2, $4			# Move x to $2
+		add $2, $0, $4			# Move x to $2
 		lw $4, stageWidth		#
 		multu $4, $5			# Multiply y by the stage width
 		mflo $4				# Get result of $4*$5
 		addu $2, $2, $4			# Add the result to the x coordinate and store in $2
 		sll $2, $2, 2			# Multiply $2 by 4 bytes
-		addu $2, $2, $28		# Add gp to v0 to give stage memory address
+		add $2, $2, $28			# Add $28 to $2 to give stage memory address
 		jr $31				#
 ###########################################################################################
-# Function to move a given stage memory address right by a given number of tiles
+# Function to add a given stage memory address right by a given number of tiles
 # Takes a0 = address, a1 = distance
 # Returns v0 = new address
-moveLeft:
+addLeft:
 		#address -= distance*4
-		move $2, $4			# Move address to $2
+		add $2, $0, $4			# Move address to $2
 		sll $4, $5, 2			# Multiply distance by 4
 		sub $2, $2, $4			# Add result to $2
 		jr $31				#
 ###########################################################################################
-# Function to move a given stage memory address up by a given number of tiles
+# Function to add a given stage memory address up by a given number of tiles
 # Takes $4 = address, $5 = distance
 # Returns $2 = new address
-moveUp:
+addUp:
 		#address -= distance*width*4
-		move $2, $4			# Move address to $2
+		add $2, $0, $4			# Move address to $2
 		lw $4, stageWidth		# Load the screen width into $4
 		multu $4, $5			# Multiply distance by screen width
 		mflo $4				# Retrieve result
 		sll $4, $4, 2			# Multiply $2 by 4
-		subu $2, $2, $4			# Sub result from $2
+		sub $2, $2, $4			# Sub result from $2
 		jr $31				#
 
 ###########################################################################################
-# Function to move a given stage memory address down by a given number of tiles
+# Function to add a given stage memory address down by a given number of tiles
 # Takes $4 = address, $5 = distance
 # Returns $2 = new address
-moveDown:
+addDown:
 		#address += distance*width*4
-		move $2, $4			# Similar to MoveUp
+		add $2, $0, $4			# Similar to MoveUp
 		lw $4, stageWidth		#
 		multu $4, $5			#
 		mflo $4			#
@@ -216,10 +216,10 @@ moveDown:
 # Takes none
 # Returns $2 = direction
 GetDir:
-		li $8, 0xFFFF0004		# Load input value
+		li $8, $0, 0xFFFF0004		# Load input value
 upPressed:
 		bne, $8, 119, GetDir_done
-		li $2, 0x02000000		# Up was pressed
+		li $2, $0, 0x02000000		# Up was pressed
 GetDir_done:
 		jr $31
 ###########################################################################################
@@ -231,7 +231,7 @@ fillColor:
 		mflo $6				# Set end point
 		sll $6, $6, 2			# Multiply by 4
 		add $6, $6, $28			# Add global pointer
-		move $5, $28			# Set start point
+		add $5, $0, $28			# Set start point
 fillColorLoop:
 		sw $4, 0($5)
 		add $5, $5, 4			# Add 4
@@ -240,31 +240,31 @@ fillColorLoop:
 ###########################################################################################
 # Add bot wall
 AddBounds:	
-		move $12, $31			# Back up $31 
+		add $12, $0, $31			# Back up $31 
 		
 		lw $8, stageWidth		# Calculate final ending position
 		lw $9, stageHeight
-		subi $8, $8, 1
-		subi $9, $9, 1
+		addi $8, $8, -1
+		addi $9, $9, -1
 
-		move $4, $0			# Convert (0, stageHeight) to address
-		move $5, $9
+		add $4, $0, $0			# Convert (0, stageHeight) to address
+		add $5, $0, $9
 		jal coordToAddr
 
-		move $10, $2			# Save the address to $10
+		add $10, $0, $2			# Save the address to $10
 
-		move $4, $8			# Convert (stageWidth, stageHeight) to address
-		move $5, $9
+		add $4, $0, $8			# Convert (stageWidth, stageHeight) to address
+		add $5, $0, $9
 		jal coordToAddr
 
-		move $11, $2			# Save the address to $11
+		add $11, $0, $2			# Save the address to $11
 
-		move $4, $10			
-		move $5, $11
+		add $4, $0, $10			
+		add $5, $0, $11
 		lw $6, playerColor
 		jal drawLineHoriz		# draw line from (0, stageHeight) to (stageWidth, stageHeight)
 		
-		move $31, $12
+		add $31, $0, $12
 		jr $31
 ###########################################################################################
 # Draw horizontal line from $4 to $5 in color $6
@@ -279,16 +279,16 @@ drawLineVert:
 		sw $6, 0($4)			# color
 		lw $7, stageWidth		
 		sll $7, $7, 2			# stageWidth*4 stored in $7
-		add $4, $4, $7			# move to next pixel downwards
+		add $4, $4, $7			# add to next pixel downwards
 		bne $4, $5, drawLineVert	# keep doing this until $5
 		jr $31
 ###########################################################################################
 # Draw the player given an address, $4, of top left corner, in the color $5
 drawPlayer:
-		move $14, $31			# back up $31
+		add $14, $0, $31			# back up $31
 		
-		move $8, $4			# back up start address (top left coord)
-		move $13, $5			# back up color
+		add $8, $0, $4			# back up start address (top left coord)
+		add $13, $0, $5			# back up color
 		lw $9, playerSize
 		sll $9, $9, 2			# playerSize*4 stored in $9
 		add $10, $8, $9			# player top right coord
@@ -298,31 +298,31 @@ drawPlayer:
 		add $11, $11, $8		# player bottom left coord
 		add $12, $11, $9		# player bottom right coord
 
-		move $6, $13			
-		move $5, $10
+		add $6, $0, $13			
+		add $5, $0, $10
 		jal drawLineHoriz		# draw top line of player
 
-		move $4, $8			
-		move $5, $11
+		add $4, $0, $8			
+		add $5, $0, $11
 		jal drawLineVert		# draw left line of player
 
-		move $4, $11
-		move $5, $12
+		add $4, $0, $11
+		add $5, $0, $12
 		jal drawLineHoriz		# draw bottom line of player
 
-		move $4, $10
-		move $5, $12
+		add $4, $0, $10
+		add $5, $0, $12
 		jal drawLineVert		# draw right line of player
 		
-		move $31, $14
+		add $31, $0, $14
 		jr $31
 ###########################################################################################
 # Draw pipe from an address $4 in top left corner with height $5 in color $6
 drawPipe:
-		move $24, $31 			# back up $31
+		add $24, $0, $31 			# back up $31
 		
-		move $8, $4			# Back up $4-$6 bc will call other functions
-		move $9, $5
+		add $8, $0, $4			# Back up $4-$6 bc will call other functions
+		add $9, $0, $5
 		lw $11, pipeWidth
 		sll $11, $11, 2			# pipeWidth*4 stored in $11
 
@@ -333,17 +333,17 @@ drawPipe:
 		sll $12, $12, 2			# pipeHeight*stageWidth*4 stored in $12
 
 		add $13, $8, $12		# $13 is bottom left corner of top part of pipe
-		move $5, $13
+		add $5, $0, $13
 		jal drawLineVert		# draw line from $8/$4 down to $13
 
 		add $14, $13, $11		# $14 is bottom right corner of top part of pipe
-		move $4, $13
-		move $5, $14
+		add $4, $0, $13
+		add $5, $0, $14
 		jal drawLineHoriz		# draw line from $13 to $14
 
 		add $15, $8, $11		# $15 is top right corner of top part of pipe
-		move $4, $15
-		move $5, $14
+		add $4, $0, $15
+		add $5, $0, $14
 		jal drawLineVert		# draw line from $15 down to $14
 
 		lw $12, pipeGap
@@ -354,8 +354,8 @@ drawPipe:
 
 		add $14, $13, $12		# $14 is now top left corner of bot part of pipe
 		add $15, $14, $11		# $15 is now top right corner of bot part of pipe
-		move $4, $14
-		move $5, $15
+		add $4, $0, $14
+		add $5, $0, $15
 		jal drawLineHoriz		# draw line from $14 to $15
 
 		lw $12, stageHeight
@@ -365,16 +365,16 @@ drawPipe:
 		mflo $12
 		sll $12, $12, 2			# (stageHeight-1)*stageWidth*4 stored in $12
 		add $13, $12, $8		# $13 is now bottom left corner of bot part of pipe
-		move $4, $14
-		move $5, $13
+		add $4, $0, $14
+		add $5, $0, $13
 		jal drawLineVert 		# draw line from $14 to $13
 
 		add $12, $13, $11		# $12 is now bottom right corner of bot part of pipe
-		move $4, $15
-		move $5, $12
+		add $4, $0, $15
+		add $5, $0, $12
 		jal drawLineVert		# draw line from $15 to $12
 		
-		move $31, $24
+		add $31, $0, $24
 		jr $31
 ###########################################################################################
 # Detects collision between bird and pipe
