@@ -1,12 +1,14 @@
 .text
 
-initializeProgram:
-
 lw $3, vgaStart($0)
 lw $2, delayConst($0)
-addi $23, $0, 0	#init bird dY
-addi $26, $0, 50 #init bird Y
-addi $22, $0, 0	#reset pipes
+
+initializeProgram:
+
+addi $21, $0, 0	#init bird dY
+addi $23, $0, 1280 #init bird Y
+addi $22, $0, 120	#reset pipes
+addi $20, $0, 0
 
 jal delay		#NEED THIS DONT KNOW WHY
 j begin
@@ -235,7 +237,7 @@ jal blankScreen
 jal drawAllPipe
 jal drawPlayer
 jal delay
-
+addi $20, $20, 1	#keep score
 
 j begin
 
