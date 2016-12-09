@@ -173,7 +173,9 @@ drawAllPipe:
 		addi $16, $22, 0
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
-		addi $19, $0, 30
+		addi $19, $24, 0
+
+
 
 		jal checkGameEnd
 
@@ -182,7 +184,7 @@ drawAllPipe:
 		addi $16, $22, 43
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
-		addi $19, $0, 40
+		addi $19, $25, 0
 
 		jal checkGameEnd
 
@@ -191,7 +193,7 @@ drawAllPipe:
 		addi $16, $22, 86
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
-		addi $19, $0, 50
+		addi $19, $26, 0
 
 		jal checkGameEnd
 
@@ -222,12 +224,12 @@ checkGameEndReturn:
 ################################################
 #Game finished due to collision
 gameEnd:
-	addi $8, $0, 500
+	addi $9, $0, 100
 
 gameEndLoop:
-	#jal delay
-	#addi $8, $8, -1
-	#bne $0, $8, gameEndLoop
+	jal blankScreen
+	addi $9, $9, -1
+	bne $0, $9, gameEndLoop
 
 	j initializeProgram
 
