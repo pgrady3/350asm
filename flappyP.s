@@ -9,6 +9,9 @@ addi $21, $0, 0	#init bird dY
 addi $23, $0, 1280 #init bird Y
 addi $22, $0, 120	#reset pipes
 addi $20, $0, 0
+addi $24, $0, 60
+addi $25, $0, 40
+addi $26, $0, 50
 
 jal delay		#NEED THIS DONT KNOW WHY
 j begin
@@ -173,7 +176,13 @@ drawAllPipe:
 		addi $16, $22, 0
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
-		addi $19, $0, 30
+		addi $19, $24, 0
+
+		bne $16, $0, endRand
+		add $24, $24, $20
+		and $24, $24, $8
+
+	endRand:
 
 		jal checkGameEnd
 
@@ -182,7 +191,7 @@ drawAllPipe:
 		addi $16, $22, 43
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
-		addi $19, $0, 40
+		addi $19, $25, 0
 
 		jal checkGameEnd
 
@@ -191,7 +200,7 @@ drawAllPipe:
 		addi $16, $22, 86
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
-		addi $19, $0, 50
+		addi $19, $26, 0
 
 		jal checkGameEnd
 
@@ -246,7 +255,7 @@ quit:
 j quit
 
 .data
-delayConst:  .word 0x00018240
+delayConst:  .word 0x00018000
 vgaStart:  .word 0x40000000
 
 #delayConst: .word 1000					#FOR MARS$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
