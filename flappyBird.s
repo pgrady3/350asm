@@ -6,7 +6,11 @@ playerX:		.word 5			# Position of bird
 playerY:		.word 32		# Half of stageHeight
 playerSize:		.word 3			# Dimensions of bird; bird is a square
 
+<<<<<<< HEAD
 defaultDir: 	.word 0xFFFF0004
+=======
+#defaultDir: 		.word 0xFFFF0004
+>>>>>>> 39c0d8d4939915423fc02b35ef76d1713894472e
 gravity: 		.word 1			# Downward force
 boost: 			.word 5			# Upwards force when button is pressed
 pipeWidth: 		.word 6			# Pipe width
@@ -14,8 +18,15 @@ pipeGap:		.word 16		# Space between top and bottom pipes
 pipeSpace: 		.word 16		# Space between each set of top/bottom pipes
 pipeHeight:   	.word 20		# Pipe height
 
+<<<<<<< HEAD
 playerColor:	.word 0x0022CC22	# Store color to draw objects
 bgndColor:		.word 0xFF003300	# Store color to draw background
+=======
+playerColor:		.word 0x0022CC22	# Store color to draw objects
+#bgndColor:		.word 0xFF003300	# Store color to draw background
+
+vgaStart:  .word 0x40000000
+>>>>>>> 39c0d8d4939915423fc02b35ef76d1713894472e
 
 .text
 main:
@@ -23,7 +34,12 @@ main:
 mainInit:
 			# addi $29, $0, 1024	# $sp = 1024
 			# Prepare the arena
+<<<<<<< HEAD
 			lw $4, bgndColor($0)	# Fill stage with background color
+=======
+			lw $29, vgaStart($0)
+			lw $4, bgndColor	# Fill stage with background color
+>>>>>>> 39c0d8d4939915423fc02b35ef76d1713894472e
 			jal fillColor
 			jal AddBounds		# Add walls
 			
@@ -91,9 +107,12 @@ mainGameCtd:
 mainGameOver:
 			j mainInit
 
-###########################################################################################
-# Get x,y coordinates stored in $4,$5 and draws in color $6
+#FUNCTION drawPixel------------------------------------------
+#Draws the pixel at x = $4, y = $5, color = $6
+#Dicks with registers: all the T registers from 8 to 15
+#---------------------------
 drawPixel:
+<<<<<<< HEAD
 		#address = 4*(x + y*width) + gp
 		add $8, $0, $4			# Move x to $8
 		lw $4, stageWidth($0)		#
@@ -104,6 +123,16 @@ drawPixel:
 		add $8, $8, $28			# Add $28 to $2 to give stage memory address
 		sw $6, 0($8)			# color in the pixel
 		jr $31				#
+=======
+sll $8, $5, 7
+add $8, $8, $4				#Add X offset to $8
+add $8, $8, $29
+sw $6, 0($8)				#Draw the pixel
+
+jr $31
+#FUNCTION END------------------------------------------------
+		#
+>>>>>>> 39c0d8d4939915423fc02b35ef76d1713894472e
 ###########################################################################################
 # Function to retrieve input from the keyboard and return it as an alpha channel direction
 # Takes none
