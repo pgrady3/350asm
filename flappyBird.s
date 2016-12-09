@@ -7,7 +7,7 @@ playerY:		.word 32		# Half of stageHeight
 playerSize:		.word 3			# Dimensions of bird; bird is a square
 
 defaultDir: 		.word 0xFFFF0004
-gravity: 		.word 3			# Downward force
+gravity: 		.word 1			# Downward force
 boost: 			.word 5			# Upwards force when button is pressed
 pipeWidth: 		.word 6			# Pipe width
 pipeGap:		.word 16		# Space between top and bottom pipes
@@ -37,7 +37,7 @@ mainInit:
 			# Prepare the arena
 			add $4, $0, $23		# Fill stage with background color
 			jal fillColor
-			jal AddBounds		# Add walls
+#			jal AddBounds		# Add walls
 
 			# Draw initial player
 			add $4, $0, $16
@@ -188,7 +188,7 @@ moveLeft:
 # Function to add a given stage memory address up by a given number of tiles
 # Takes $4 = address, $5 = distance
 # Returns $2 = new address
-moveUp:
+moveUp: 
 		#address -= distance*width*4
 		add $2, $0, $4			# Move address to $2
 		lw $4, stageWidth		# Load the screen width into $4
@@ -240,7 +240,7 @@ fillColorLoop:
 ###########################################################################################
 # Add bot wall
 AddBounds:	
-		add $12, $0, $31			# Back up $31 
+		add $12, $0, $31		# Back up $31 
 		
 		lw $8, stageWidth		# Calculate final ending position
 		lw $9, stageHeight
@@ -285,7 +285,7 @@ drawLineVert:
 ###########################################################################################
 # Draw the player given an address, $4, of top left corner, in the color $5
 drawPlayer:
-		add $14, $0, $31			# back up $31
+		add $14, $0, $31		# back up $31
 		
 		add $8, $0, $4			# back up start address (top left coord)
 		add $13, $0, $5			# back up color

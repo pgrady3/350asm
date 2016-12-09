@@ -25,7 +25,7 @@ jr $31
 drawPixel:
 lw $8, vgaStart($0)			#Load VGAStart into $8
 lw $9, screenWidth($0)		#Load width into $9
-mul $9, $9, $26				#Mutiply width * Y
+mul $9, $9, $26				#Multiply width * Y
 add $8, $8, $9				#Add Y offset to $8
 add $8, $8, $25				#Add X offset to $8
 sw $27, 0($8)				#Draw the pixel

@@ -7,7 +7,7 @@ playerY:		.word 32		# Half of stageHeight
 playerSize:		.word 3			# Dimensions of bird; bird is a square
 
 defaultDir: 		.word 0xFFFF0004
-gravity: 		.word 3			# Downward force
+gravity: 		.word 1			# Downward force
 boost: 			.word 5			# Upwards force when button is pressed
 pipeWidth: 		.word 6			# Pipe width
 pipeGap:		.word 16		# Space between top and bottom pipes
