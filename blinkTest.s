@@ -9,7 +9,6 @@ j begin
 #Dicks with registers: 10
 #---------------------------
 delay1S:
-sub $0, $0, $0
 lw $10, delayCont($0)
 delayLoop:
 addi $10, $10, -1
@@ -34,15 +33,41 @@ sw $27, 0($8)				#Draw the pixel
 jr $31
 #FUNCTION END------------------------------------------------
 
+#FUNCTION drawRect------------------------------------------
+#Draws the rect at x = $20, y = $21, w = $22, h = $23, color = $24
+#Dicks with registers: all the T registers from 8 to 15
+#---------------------------
+drawRect:
+
+addi $25, $20, 0
+addi $26, $21, 0
+addi $27, $24, 0
+
+add $10, $20, $22	#The end limit in X
+add $11, $21, $23	#The end limit in Y
+
+drawRow:
+jal drawPixel
+addi $25, $25, 1
+blt $25, $10, drawRow
+
+addi $26, $26, 1
+addi $25, $20, 0
+blt $26, $11, drawRow
+
+jr $31
+#FUNCTION END------------------------------------------------
+
 
 begin:
 
-addi $20, $0, 1
+addi $20, $20, 1
 
-addi $25, $20, 0
-addi $26, $20, 0
-addi $27, $20, 0
-jal drawPixel
+addi $21, $20, 0
+addi $22, $20, 0
+addi $23, $20, 0
+addi $24, $20, 0
+jal drawRect
 
 jal delay1S
 
