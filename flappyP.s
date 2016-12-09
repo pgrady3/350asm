@@ -2,6 +2,9 @@
 
 lw $3, vgaStart($0)
 lw $2, delayConst($0)
+addi $23, $0, 0	#init bird dY
+addi $26, $0, 50 #init bird Y
+
 jal delay		#NEED THIS DONT KNOW WHY
 j begin
 
@@ -98,13 +101,21 @@ jr $31
 drawPlayer:
 	add $28, $0, $31		# back up $31
 	
-	addi $23, $23, 10		# CONST************ make bird fall
+	lw $8, 0xFFF($0)
+	addi $9, $0, -10
+	and $9, $9, $8
+	add $21, $21, $9
+	addi $20, $8, 0
+
+	addi $21, $21, 1		#increase down accel
+	add $23, $23, $21		#make bird fall
+
+	sra $17, $23, 5			#Set Y to a scaled down version
 
 	addi $16, $0, 10		# X coord
-	addi $17, $23, 0		# Y
-	addi $18, $0, 10		# W
-	addi $19, $0, 10		# H
-	addi $6, $0, 0xFF		# Color
+	addi $18, $0, 5		# W
+	addi $19, $0, 5		# H
+	addi $6, $0, 0x1		# Color
 
 	jal drawRect
 	
@@ -135,8 +146,8 @@ drawPipe:
 # Draw all pipes from x at $4 in top left corner in color $5
 drawAllPipe:
 		add $27, $0, $31 	#BACK IT UP
-		
-		addi $22, $22, -5	#CONST, pipe moving back in X
+
+		addi $22, $22, -1	#CONST, pipe moving back in X
 		
 		addi $16, $22, 0
 		addi $8, $0, 0x7F	#Load constant to and with
@@ -162,7 +173,7 @@ drawAllPipe:
 
 begin:
 
-jal fillColor
+jal blankScreen
 jal drawAllPipe
 jal drawPlayer
 jal delay
@@ -175,7 +186,7 @@ quit:
 j quit
 
 .data
-delayConst:  .word 0x00044240
+delayConst:  .word 0x00018240
 vgaStart:  .word 0x40000000
 
 #delayConst: .word 1000					#FOR MARS$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
