@@ -222,12 +222,12 @@ checkGameEndReturn:
 ################################################
 #Game finished due to collision
 gameEnd:
-	addi $8, $0, 500
+	addi $10, $0, 800
 
 gameEndLoop:
-	#jal delay
-	#addi $8, $8, -1
-	#bne $0, $8, gameEndLoop
+	jal blankScreen
+	addi $10, $10, -1
+	bne $0, $10, gameEndLoop
 
 	j initializeProgram
 
