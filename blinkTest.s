@@ -38,6 +38,7 @@ jr $31
 #Dicks with registers: all the T registers from 8 to 15
 #---------------------------
 drawRect:
+addi $15, $31, 0	#BACK DAT STACK
 
 addi $25, $20, 0
 addi $26, $21, 0
@@ -55,6 +56,7 @@ addi $26, $26, 1
 addi $25, $20, 0
 blt $26, $11, drawRow
 
+addi $31, $15, 0	#UNBACK DAT STACK
 jr $31
 #FUNCTION END------------------------------------------------
 
