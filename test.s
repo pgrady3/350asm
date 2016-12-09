@@ -81,7 +81,7 @@ mainGame:
 			# Update bird
 			jal GetDir		# Get direction from keyboard
 			add $20, $0, $2		# $20 is direction from keyboard
-			add $4, $0, $16 	# Load position
+			add $4, $0, $16 		# Load position
 
 			# Move up or add down based on if button pressed
 mainMoveUp:
@@ -102,7 +102,7 @@ mainGameCtd:
 			jal drawPlayer
 
 			# update player with new position
-			add $16, $0, $2 	# Update address
+			add $16, $0, $2 		# Update address
 			add $4, $0, $16
 			jal drawPlayer		# Update player's location on screen
 
@@ -207,9 +207,9 @@ addDown:
 		add $2, $0, $4			# Similar to MoveUp
 		lw $4, stageWidth		#
 		multu $4, $5			#
-		mflo $4				#
+		mflo $4			#
 		sll $4, $4, 2			#
-		addu $2, $2, $4			#
+		addu $2, $2, $4		#
 		jr $31				#
 ###########################################################################################
 # Function to retrieve input from the keyboard and return it as an alpha channel direction
@@ -319,7 +319,7 @@ drawPlayer:
 ###########################################################################################
 # Draw pipe from an address $4 in top left corner with height $5 in color $6
 drawPipe:
-		add $24, $0, $31 		# back up $31
+		add $24, $0, $31 			# back up $31
 		
 		add $8, $0, $4			# Back up $4-$6 bc will call other functions
 		add $9, $0, $5
