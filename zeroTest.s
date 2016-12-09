@@ -1,11 +1,6 @@
 .text
 
-addi $20, $0, 5
-
-mainLoop:
-jal delay1S
-addi $20, $20, 1
-
+j begin
 #-----------------------------------------------------------------
 
 delay1S:
@@ -18,6 +13,23 @@ bne $0, $10, delayLoop
 
 jr $31
 #-------------------------------------------------------------
+
+begin:
+#addi $0, $0, 5
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+addi $20, $0, 5
+
+mainLoop:
+jal delay1S
+addi $20, $20, 1
+j mainLoop
+
 
 
 quit:
