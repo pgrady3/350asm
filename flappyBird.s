@@ -1,20 +1,20 @@
 .data
 stageWidth:		.word 64		# Stage size
-stageHeight:		.word 64		# Settings: use $gp, 64x64, 8x Scaling, 512x512
+stageHeight:	.word 64		# Settings: use $gp, 64x64, 8x Scaling, 512x512
 
 playerX:		.word 5			# Position of bird
 playerY:		.word 32		# Half of stageHeight
 playerSize:		.word 3			# Dimensions of bird; bird is a square
 
-defaultDir: 		.word 0xFFFF0004
+defaultDir: 	.word 0xFFFF0004
 gravity: 		.word 1			# Downward force
 boost: 			.word 5			# Upwards force when button is pressed
 pipeWidth: 		.word 6			# Pipe width
 pipeGap:		.word 16		# Space between top and bottom pipes
 pipeSpace: 		.word 16		# Space between each set of top/bottom pipes
-pipeHeight:   		.word 20		# Pipe height
+pipeHeight:   	.word 20		# Pipe height
 
-playerColor:		.word 0x0022CC22	# Store color to draw objects
+playerColor:	.word 0x0022CC22	# Store color to draw objects
 bgndColor:		.word 0xFF003300	# Store color to draw background
 
 .text
@@ -23,28 +23,28 @@ main:
 mainInit:
 			# addi $29, $0, 1024	# $sp = 1024
 			# Prepare the arena
-			lw $4, bgndColor	# Fill stage with background color
+			lw $4, bgndColor($0)	# Fill stage with background color
 			jal fillColor
 			jal AddBounds		# Add walls
 			
 			# Load player info
-			lw $4, playerX 		#
-			lw $5, playerY
-			lw $6, playerColor
+			lw $4, playerX($0) 		#
+			lw $5, playerY($0)
+			lw $6, playerColor($0)
 			
 			# draw initial player
 			jal drawPlayer		# Convert player position to address
 
-			lw $20, defaultDir	# Store default dir in $20
+			lw $20, defaultDir($0)	# Store default dir in $20
 
 			# Store player location
 			add $22, $0, $4		# Store playerX in $22
 			add $23, $0, $5		# Store playerY in $23
 			
 			# Draw initial pipes
-			lw $16, pipeSpace	# store x of first pipe 
+			lw $16, pipeSpace($0)	# store x of first pipe 
 			add $4, $0, $16 	# redraw the pipes
-			lw $5, playerColor 
+			lw $5, playerColor($0) 
 			jal drawAllPipe
 
 #mainWaitToStart:
@@ -62,25 +62,25 @@ mainGame:
 			# Move up or add down based on if button pressed
 mainMoveUp:
 			bne, $20, 0x02000000, mainMoveDown
-			lw $5, boost
+			lw $5, boost($0)
 			add $23, $23, $5		# update bird y
 			j mainGameCtd
 
 mainMoveDown:
-			lw $5, gravity
+			lw $5, gravity($0)
 			add $23, $23, $5		# Down
 
 mainGameCtd:
 			# update player with new position
 			add $4, $0, $22
 			add $5, $0, $23
-			lw $6, playerColor
+			lw $6, playerColor($0)
 			jal drawPlayer		# Update player's location on screen
 
 			# draw in updated pipes
 			addi $16, $16, -1	# move pipes left 
 			add $4, $0, $16 	# redraw the pipes
-			lw $5, playerColor 
+			lw $5, playerColor($0)
 			jal drawAllPipe
 
 			jal collisionDetect	# Check for collisions
@@ -96,10 +96,10 @@ mainGameOver:
 drawPixel:
 		#address = 4*(x + y*width) + gp
 		add $8, $0, $4			# Move x to $8
-		lw $4, stageWidth		#
-		multu $4, $5			# Multiply y by the stage width
-		mflo $4				# Get result of $4*$5
-		addu $8, $8, $4			# Add the result to the x coordinate and store in $2
+		lw $4, stageWidth($0)		#
+		mul $4, $4, $5			# Multiply y by the stage width
+		#mflo $4				# Get result of $4*$5
+		add $8, $8, $4			# Add the result to the x coordinate and store in $2
 		sll $8, $8, 2			# Multiply $2 by 4 bytes
 		add $8, $8, $28			# Add $28 to $2 to give stage memory address
 		sw $6, 0($8)			# color in the pixel
@@ -111,7 +111,7 @@ drawPixel:
 GetDir:
 		addi $8, $0, 0xFFFF0004		# Load input value
 upPressed:
-		bne, $8, 119, GetDir_done
+		bne $8, 119, GetDir_done
 		addi $2, $0, 0x02000000		# Up was pressed
 GetDir_done:
 		jr $31
@@ -123,8 +123,8 @@ fillColor:
 		
 		add $4, $0, $0
 		add $5, $0, $0
-		lw $6, stageWidth		
-		lw $7, stageHeight
+		lw $6, stageWidth($0)		
+		lw $7, stageHeight($0)
 		
 		jal drawRect			# fill screen 
 		
@@ -136,10 +136,10 @@ AddBounds:
 		add $24, $0, $31			# back up $31
 		
 		add $4, $0, $0			# draw line from x
-		lw $5, stageWidth		# to end of screen
-		lw $6, stageHeight		# at stageHeight
+		lw $5, stageWidth($0)		# to end of screen
+		lw $6, stageHeight($0)		# at stageHeight
 		addi $6, $6, -1			# minus 1
-		lw $7, playerColor
+		lw $7, playerColor($0)
 		
 		jal drawLineHorizXY
 		
@@ -196,9 +196,9 @@ keepDrawingAcross:
 # Draw the player given an x, y coord $4, $5, of top left corner, in the color $6
 drawPlayer:
 		add $24, $0, $31		# back up $31
-		lw $6, playerSize	# width
-		lw $7, playerSize 	# heigth = width
-		lw $30, playerColor
+		lw $6, playerSize($0)	# width
+		lw $7, playerSize($0) 	# heigth = width
+		lw $30, playerColor($0)
 		jal drawRect
 		
 		add $31, $0, $24
@@ -213,16 +213,16 @@ drawPipe:
 		add $30, $0, $6		# color 
 		
 		add $5, $0, $0
-		lw $6, pipeWidth
+		lw $6, pipeWidth($0)
 		add $7, $0, $27		# height
 		jal drawRect
 		
-		lw $11, pipeGap
+		lw $11, pipeGap($0)
 		add $5, $5, $11		# move y to bottom half of pipe 
 		add $5, $5, $27 
 		add $4, $0, $26		# move x to $4
-		lw $6, pipeWidth
-		lw $12, stageHeight
+		lw $6, pipeWidth($0)
+		lw $12, stageHeight($0)
 		sub $7, $12, $5		# calculate height of this 
 		jal drawRect
 		
@@ -235,31 +235,31 @@ drawAllPipe:
 		add $17, $0, $4
 		add $30, $0, $5
 		
-		lw $5, pipeHeight	
-		lw $6, playerColor
+		lw $5, pipeHeight($0)
+		lw $6, playerColor($0)
 		jal drawPipe
 			
-		lw $18, pipeWidth
-		lw $19, pipeSpace
+		lw $18, pipeWidth($0)
+		lw $19, pipeSpace($0)
 		add $17, $17, $18	# second pipe 
 		add $17, $17, $19
 		add $4, $0, $17
-		lw $5, pipeHeight	
-		lw $6, playerColor
+		lw $5, pipeHeight($0)	
+		lw $6, playerColor($0)
 		jal drawPipe
 
 		add $17, $17, $18	# third pipe 
 		add $17, $17, $19
 		add $4, $0, $17
-		lw $5, pipeHeight	
-		lw $6, playerColor
+		lw $5, pipeHeight($0)	
+		lw $6, playerColor($0)
 		jal drawPipe
 			
 		add $17, $17, $18	# fourth pipe 
 		add $17, $17, $19
 		add $4, $0, $17
-		lw $5, pipeHeight	
-		lw $6, playerColor
+		lw $5, pipeHeight($0)	
+		lw $6, playerColor($0)
 		jal drawPipe
 		
 		add $31, $0, $21
