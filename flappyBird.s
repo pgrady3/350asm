@@ -42,37 +42,9 @@ mainInit:
 
 			# Draw initial pipes
 			lw $16, pipeSpace	# store x of first pipe 
-			add $4, $0, $16
-			add $5, $0, $0
-			lw $6, pipeHeight	
-			lw $7, playerColor
-			jal drawPipe
-			
-			lw $17, pipeWidth
-			lw $18, pipeSpace
-			add $16, $16, $17	# second pipe 
-			add $16, $16, $18
-			add $4, $0, $16
-			add $5, $0, $0
-			lw $6, pipeHeight	
-			lw $7, playerColor
-			jal drawPipe
-
-			add $16, $16, $17	# third pipe 
-			add $16, $16, $18
-			add $4, $0, $16
-			add $5, $0, $0
-			lw $6, pipeHeight	
-			lw $7, playerColor
-			jal drawPipe
-			
-			add $16, $16, $17	# fourth pipe 
-			add $16, $16, $18
-			add $4, $0, $16
-			add $5, $0, $0
-			lw $6, pipeHeight	
-			lw $7, playerColor
-			jal drawPipe
+			add $4, $0, $16 	# redraw the pipes
+			lw $5, playerColor 
+			jal drawAllPipe
 
 #mainWaitToStart:
 			# Wait for the player to press key to start game
@@ -108,6 +80,7 @@ mainGameCtd:
 			addi $16, $16, -1	# move pipes left 
 			add $4, $0, $16 	# redraw the pipes
 			lw $5, playerColor 
+			jal drawAllPipe
 
 			jal collisionDetect	# Check for collisions
 
@@ -197,7 +170,7 @@ GetDir_done:
 ###########################################################################################
 # Fill stage with color, $4
 fillColor:
-		add $8, $0, $31			# back up $31
+		add $24, $0, $31			# back up $31
 		add $30, $0, $4			# back up color 
 		
 		add $4, $0, $0
@@ -207,12 +180,12 @@ fillColor:
 		
 		jal drawRect			# fill screen 
 		
-		add $31, $0, $8
+		add $31, $0, $24
 		jr $31
 ###########################################################################################
 # Add bot wall
 AddBounds:	
-		add $8, $0, $31			# back up $31
+		add $24, $0, $31			# back up $31
 		
 		add $4, $0, $0			# draw line from x
 		lw $5, stageWidth		# to end of screen
@@ -222,7 +195,7 @@ AddBounds:
 		
 		jal drawLineHorizXY
 		
-		add $31, $0, $8			
+		add $31, $0, $24			
 		jr $31
 ###########################################################################################
 # Unused
@@ -245,22 +218,24 @@ drawLineVert:
 ###########################################################################################
 # Draw horizontal line from $4, $6 (x1, y) to $5, $6 (x2, y) in color $7
 drawLineHorizXY:
-		add $8, $0, $31			# back up $31
+		add $2, $0, $31			# back up $31
 		
 		add $9, $0, $4			# back up $4 (x1)
 		add $10, $0, $5			# back up $5 (x2)
 		add $11, $0, $6			# back up $6 (y)
 		
 		add $5, $0, $6			# move y to $5
+		add $6, $0, $7
 		jal drawPixel			# draw (x1, y)
 keepMovingRight:	
 		addi $9, $9, 1			# move x1 right by 1 coord
 		add $4, $0, $9			# move x1 to $4
 		add $5, $0, $11			# move y to $5
+		add $6, $0, $7
 		jal drawPixel
 		blt $9, $10, keepMovingRight
 	
-		add $31, $0, $8
+		add $31, $0, $2
 		jr $31
 ###########################################################################################
 # Unused 
@@ -285,57 +260,57 @@ keepMovingDown:
 ###########################################################################################
 # Draw rectangle from $4, $5 (x, y) with width $6, and height $7, in color $30
 drawRect:
-		add $8, $0, $31			# back up $31
+		add $25, $0, $31		# back up $31
 		
-		add $9, $0, $4			# back up $4 (x)
-		add $10, $0, $5			# back up $5 (y)
+		add $12, $0, $4			# back up $4 (x)
+		add $13, $0, $5			# back up $5 (y)
 		
-		add $11, $9, $6			# calculate end x
-		add $12, $10, $7 		# calculate end y
+		add $14, $12, $6		# calculate end x
+		add $15, $13, $7 		# calculate end y
 		
-		add $5, $0, $11			# move end x to $5
-		add $6, $0, $10			# move y to $6
+		add $5, $0, $14			# move end x to $5
+		add $6, $0, $13			# move y to $6
 		add $7, $0, $30			# move color to $7
 		jal drawLineHorizXY		# draw line from x, y to end x, y
 keepDrawingAcross:	
-		addi $10, $10, 1		# move y down by 1 coord
-		add $4, $0, $9			# move x to $4
-		add $5, $0, $11			# move end x to $5
-		add $6, $0, $10			# move y to $6
+		addi $13, $13, 1		# move y down by 1 coord
+		add $4, $0, $12			# move x to $4
+		add $5, $0, $14			# move end x to $5
+		add $6, $0, $13			# move y to $6
 		jal drawLineHorizXY
-		blt $10, $11, keepDrawingAcross
+		blt $12, $14, keepDrawingAcross
 		
-		add $31, $0, $8
+		add $31, $0, $25
 		jr $31
 ###########################################################################################
 
 # Draw the player given an x, y coord $4, $5, of top left corner, in the color $6
 drawPlayer:
-		add $8, $0, $31		# back up $31
+		add $24, $0, $31		# back up $31
 		lw $6, playerSize	# width
 		lw $7, playerSize 	# heigth = width
 		add $30, $0, $6
 		jal drawRect
 		
-		add $31, $0, $8
+		add $31, $0, $24
 		jr $31
 ###########################################################################################
 # Draw pipe from x at $4 in top left corner with height $5 in color $6
 drawPipe:
 		add $24, $0, $31 	# back up $31
 		
-		add $8, $0, $4		# back up x
-		add $9, $0, $5		# back up height
+		add $26, $0, $4		# back up x
+		add $27, $0, $5		# back up height
 		add $30, $0, $7		# color 
 		
 		add $5, $0, $0
 		lw $6, pipeWidth
-		add $7, $0, $9		# height
+		add $7, $0, $27		# height
 		jal drawRect
 		
 		lw $11, pipeGap
 		add $5, $10, $11	# move y to bottom half of pipe 
-		add $4, $0, $8		# move x to $4
+		add $4, $0, $26		# move x to $4
 		lw $6, pipeWidth
 		lw $12, stageHeight
 		sub $7, $12, $5		# calculate height of this 
@@ -346,38 +321,38 @@ drawPipe:
 ###########################################################################################
 # Draw all pipes from x at $4 in top left corner in color $5
 drawAllPipe:
-		add $8, $0, $31 
-		add $9, $0, $4
-		add $10, $0, $5
+		add $15, $0, $31 
+		add $17, $0, $4
+		add $30, $0, $5
 		
 		lw $5, pipeHeight	
 		lw $6, playerColor
 		jal drawPipe
 			
-		lw $11, pipeWidth
-		lw $12, pipeSpace
-		add $8, $8, $11		# second pipe 
-		add $8, $8, $12
-		add $4, $0, $8
+		lw $18, pipeWidth
+		lw $19, pipeSpace
+		add $17, $17, $18	# second pipe 
+		add $17, $17, $19
+		add $4, $0, $17
 		lw $5, pipeHeight	
 		lw $6, playerColor
 		jal drawPipe
 
-		add $8, $8, $11		# second pipe 
-		add $8, $8, $12
-		add $4, $0, $8
+		add $17, $17, $18	# third pipe 
+		add $17, $17, $19
+		add $4, $0, $17
 		lw $5, pipeHeight	
 		lw $6, playerColor
 		jal drawPipe
 			
-		add $8, $8, $11		# second pipe 
-		add $8, $8, $12
-		add $4, $0, $8
+		add $17, $17, $18	# fourth pipe 
+		add $17, $17, $19
+		add $4, $0, $17
 		lw $5, pipeHeight	
 		lw $6, playerColor
 		jal drawPipe
 		
-		add $31, $0, $8
+		add $31, $0, $15
 		jr $31
 ###########################################################################################
 # Detects collision between bird and pipe
