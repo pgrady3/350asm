@@ -21,8 +21,14 @@ bgndColor:		.word 0xFF003300	# Store color to draw background
 main:
 
 mainInit:
+			# addi $29, $0, 1024	# $sp = 1024
+			# Prepare the arena
+			lw $4, bgndColor	# Fill stage with background color
+			jal fillColor
+			jal AddBounds		# Add walls
+			
 			# Load player info
-			lw $4, playerX 	#
+			lw $4, playerX 		#
 			lw $5, playerY
 			lw $6, playerColor
 			
@@ -34,12 +40,7 @@ mainInit:
 			# Store player location
 			add $22, $0, $4		# Store playerX in $22
 			add $23, $0, $5		# Store playerY in $23
-
-			# Prepare the arena
-			lw $4, bgndColor	# Fill stage with background color
-			jal fillColor
-			jal AddBounds		# Add walls
-
+			
 			# Draw initial pipes
 			lw $16, pipeSpace	# store x of first pipe 
 			add $4, $0, $16 	# redraw the pipes
@@ -85,24 +86,11 @@ mainGameCtd:
 			jal collisionDetect	# Check for collisions
 
 			#bne $2, $0, mainGameOver
-			b mainGame
+			j mainGame
 
 mainGameOver:
-			b mainInit
+			j mainInit
 
-###########################################################################################
-# Unused
-# Get x,y coordinates stored in $4,$5 and returns pixel address in $2
-coordToAddr:
-		#address = 4*(x + y*width) + gp
-		add $2, $0, $4			# Move x to $2
-		lw $4, stageWidth		#
-		multu $4, $5			# Multiply y by the stage width
-		mflo $4				# Get result of $4*$5
-		addu $2, $2, $4			# Add the result to the x coordinate and store in $2
-		sll $2, $2, 2			# Multiply $2 by 4 bytes
-		add $2, $2, $28			# Add $28 to $2 to give stage memory address
-		jr $31				#
 ###########################################################################################
 # Get x,y coordinates stored in $4,$5 and draws in color $6
 drawPixel:
@@ -115,46 +103,6 @@ drawPixel:
 		sll $8, $8, 2			# Multiply $2 by 4 bytes
 		add $8, $8, $28			# Add $28 to $2 to give stage memory address
 		sw $6, 0($8)			# color in the pixel
-		jr $31				#
-###########################################################################################
-# Unused
-# Function to add a given stage memory address right by a given number of tiles
-# Takes a0 = address, a1 = distance
-# Returns v0 = new address
-moveLeft:
-		#address -= distance*4
-		add $2, $0, $4			# Move address to $2
-		sll $4, $5, 2			# Multiply distance by 4
-		sub $2, $2, $4			# Add result to $2
-		jr $31				#
-###########################################################################################
-# Unused
-# Function to add a given stage memory address up by a given number of tiles
-# Takes $4 = address, $5 = distance
-# Returns $2 = new address
-moveUp: 
-		#address -= distance*width*4
-		add $2, $0, $4			# Move address to $2
-		lw $4, stageWidth		# Load the screen width into $4
-		multu $4, $5			# Multiply distance by screen width
-		mflo $4				# Retrieve result
-		sll $4, $4, 2			# Multiply $2 by 4
-		sub $2, $2, $4			# Sub result from $2
-		jr $31				#
-
-###########################################################################################
-# Unused
-# Function to add a given stage memory address down by a given number of tiles
-# Takes $4 = address, $5 = distance
-# Returns $2 = new address
-moveDown:
-		#address += distance*width*4
-		add $2, $0, $4			# Similar to MoveUp
-		lw $4, stageWidth		#
-		multu $4, $5			#
-		mflo $4				#
-		sll $4, $4, 2			#
-		addu $2, $2, $4			#
 		jr $31				#
 ###########################################################################################
 # Function to retrieve input from the keyboard and return it as an alpha channel direction
@@ -170,7 +118,7 @@ GetDir_done:
 ###########################################################################################
 # Fill stage with color, $4
 fillColor:
-		add $24, $0, $31			# back up $31
+		add $24, $0, $31		# back up $31
 		add $30, $0, $4			# back up color 
 		
 		add $4, $0, $0
@@ -198,24 +146,6 @@ AddBounds:
 		add $31, $0, $24			
 		jr $31
 ###########################################################################################
-# Unused
-# Draw horizontal line from $4 to $5 in color $6
-drawLineHoriz:
-		sw $6, 0($4)			# color
-		addi $4, $4, 4			# add 4 to go to next pixel on the right
-		bne $4, $5, drawLineHoriz	# keep doing this until $5
-		jr $31
-###########################################################################################
-# Unused
-# Draw vertical line from $4 to $5 in color $6
-drawLineVert:
-		sw $6, 0($4)			# color
-		lw $7, stageWidth		
-		sll $7, $7, 2			# stageWidth*4 stored in $7
-		add $4, $4, $7			# add to next pixel downwards
-		bne $4, $5, drawLineVert	# keep doing this until $5
-		jr $31
-###########################################################################################
 # Draw horizontal line from $4, $6 (x1, y) to $5, $6 (x2, y) in color $7
 drawLineHorizXY:
 		add $2, $0, $31			# back up $31
@@ -238,26 +168,6 @@ keepMovingRight:
 		add $31, $0, $2
 		jr $31
 ###########################################################################################
-# Unused 
-# Draw vertical line from $4, $5 (x, y1) to $4, $6 (x, y2) in color $7
-drawLineVertXY:
-		add $8, $0, $31			# back up $31
-		
-		add $9, $0, $4			# back up $4 (x)
-		add $10, $0, $5			# back up $5 (y1)
-		add $11, $0, $6			# back up $6 (y2)
-		
-		jal drawPixel			# draw (x, y1)
-keepMovingDown:	
-		addi $10, $10, 1		# move y1 down by 1 coord
-		add $4, $0, $9			# move x to $4
-		add $5, $0, $10			# move y1 to $5
-		jal drawPixel
-		blt $10, $11, keepMovingDown
-		
-		add $31, $0, $8
-		jr $31
-###########################################################################################
 # Draw rectangle from $4, $5 (x, y) with width $6, and height $7, in color $30
 drawRect:
 		add $25, $0, $31		# back up $31
@@ -278,18 +188,17 @@ keepDrawingAcross:
 		add $5, $0, $14			# move end x to $5
 		add $6, $0, $13			# move y to $6
 		jal drawLineHorizXY
-		blt $12, $14, keepDrawingAcross
+		blt $13, $15, keepDrawingAcross
 		
 		add $31, $0, $25
 		jr $31
 ###########################################################################################
-
 # Draw the player given an x, y coord $4, $5, of top left corner, in the color $6
 drawPlayer:
 		add $24, $0, $31		# back up $31
 		lw $6, playerSize	# width
 		lw $7, playerSize 	# heigth = width
-		add $30, $0, $6
+		lw $30, playerColor
 		jal drawRect
 		
 		add $31, $0, $24
@@ -301,7 +210,7 @@ drawPipe:
 		
 		add $26, $0, $4		# back up x
 		add $27, $0, $5		# back up height
-		add $30, $0, $7		# color 
+		add $30, $0, $6		# color 
 		
 		add $5, $0, $0
 		lw $6, pipeWidth
@@ -309,7 +218,8 @@ drawPipe:
 		jal drawRect
 		
 		lw $11, pipeGap
-		add $5, $10, $11	# move y to bottom half of pipe 
+		add $5, $5, $11		# move y to bottom half of pipe 
+		add $5, $5, $27 
 		add $4, $0, $26		# move x to $4
 		lw $6, pipeWidth
 		lw $12, stageHeight
@@ -321,7 +231,7 @@ drawPipe:
 ###########################################################################################
 # Draw all pipes from x at $4 in top left corner in color $5
 drawAllPipe:
-		add $15, $0, $31 
+		add $21, $0, $31 
 		add $17, $0, $4
 		add $30, $0, $5
 		
@@ -352,7 +262,7 @@ drawAllPipe:
 		lw $6, playerColor
 		jal drawPipe
 		
-		add $31, $0, $15
+		add $31, $0, $21
 		jr $31
 ###########################################################################################
 # Detects collision between bird and pipe
