@@ -58,14 +58,14 @@ add $10, $10, $2
 
 blt $11, $6, drawRow	#End drawRow loop
 
-jal delay1S
+#jal delay1S
 nop
 nop
 nop
 nop
 nop
 
-jal clearScreen
+#jal clearScreen
 nop
 nop
 nop
@@ -80,8 +80,15 @@ nop
 nop
 
 j beginMainLoop
+nop
+nop
+nop
+nop
+nop
+nop
 
-j quit					#If we're all done, jump to quit
+
+#j quit					#If we're all done, jump to quit
 
 #----------------------------------------------------------------
 clearScreen:
@@ -97,11 +104,28 @@ jr $31
 #-----------------------------------------------------------------
 
 delay1S:
+sub $0, $0, $0
 lw $20, delayCont($0)
 delayLoop:
 addi $20, $20, -1
+
+nop
+nop
+nop
+nop
+nop
+nop
+
 bne $0, $20, delayLoop
+nop
+nop
+nop
+nop
+nop
+nop
+
 jr $31
+#-------------------------------------------------------------
 
 quit:
 j quit					#Endless loop
@@ -114,4 +138,5 @@ rectX: .word 0
 rectY: .word 0
 rectW: .word 80
 rectH: .word 80
-delayCont: .word 0x000F4240
+delayCont: .word 0x003F4240
+zero: .word 0
