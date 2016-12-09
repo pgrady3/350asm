@@ -1,9 +1,12 @@
 .text
 
+initializeProgram:
+
 lw $3, vgaStart($0)
 lw $2, delayConst($0)
 addi $23, $0, 0	#init bird dY
 addi $26, $0, 50 #init bird Y
+addi $22, $0, 0	#reset pipes
 
 jal delay		#NEED THIS DONT KNOW WHY
 j begin
@@ -126,6 +129,7 @@ skipLowerCap:
 	
 
 	sra $17, $23, 6			#Set Y to a scaled down version
+	addi $15, $17, 0		#copy reg
 
 	addi $16, $0, 10		# X coord
 	addi $18, $0, 5		# W
@@ -168,23 +172,62 @@ drawAllPipe:
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
 		addi $19, $0, 30
+
+		jal checkGameEnd
+
 		jal drawPipe
 			
 		addi $16, $22, 43
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
 		addi $19, $0, 40
+
+		jal checkGameEnd
+
 		jal drawPipe
 
 		addi $16, $22, 86
 		addi $8, $0, 0x7F	#Load constant to and with
 		and $16, $16, $8
 		addi $19, $0, 50
+
+		jal checkGameEnd
+
 		jal drawPipe
 		
 		add $31, $0, $27
 		jr $31
 
+#CHECK END#######################################
+checkGameEnd:
+	#dont need to store RA since we're not coming back if we jump
+
+	#given current X, are we even in range
+	addi $8, $16, -15
+	blt $0, $8, checkGameEndReturn	#check if too far
+
+	#blt $16, $0, checkGameEndReturn #check if too close
+
+	blt $15, $19, gameEnd #check collision on top
+
+
+	addi $8, $19, 15
+	blt $8, $15, gameEnd
+
+checkGameEndReturn:	
+	jr $31
+
+################################################
+#Game finished due to collision
+gameEnd:
+	addi $8, $0, 500
+
+gameEndLoop:
+	#jal delay
+	#addi $8, $8, -1
+	#bne $0, $8, gameEndLoop
+
+	j initializeProgram
 
 begin:
 
