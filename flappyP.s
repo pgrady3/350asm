@@ -27,6 +27,23 @@ blt $8, $9, blankLoop
 jr $31
 #FUNCTION END------------------------------------------------
 
+###########################################################################################
+# Fill stage with color, blank
+fillColor:
+		add $28, $0, $31		# back up $31
+		
+		addi $16, $0, 0
+		addi $17, $0, 0
+		addi $18, $0, 128
+		addi $19, $0, 128
+		addi  $6, $0, 0
+		
+		jal drawRect			# fill screen 
+		
+		add $31, $0, $28
+		jr $31
+###########################################################################################
+
 #FUNCTION delay----------------------------------------------
 #Delays for roughly 100ms
 #---------------------------
@@ -94,12 +111,62 @@ drawPlayer:
 	add $31, $0, $28
 	jr $31
 
+###########################################################################################
+# Draw pipe from x at $16 gap at $19
+drawPipe:
+		add $28, $0, $31 	# back up $31
+		
+		addi $17, $0, 0
+		addi $18, $0, 10	#CONST, PIPE WIDTH
+		addi $6, $0, 0xFF
+
+		jal drawRect
+		
+		addi $17, $19, 30	#CONST, GAP HEIGHT!!!!!!!!!
+		addi $19, $0, 127	#Make H 127
+		sub $19, $19, $17	#Subtract gap
+
+		jal drawRect
+
+		add $31, $0, $28
+		jr $31
+
+###########################################################################################
+# Draw all pipes from x at $4 in top left corner in color $5
+drawAllPipe:
+		add $27, $0, $31 	#BACK IT UP
+		
+		addi $22, $22, -5	#CONST, pipe moving back in X
+		
+		addi $16, $22, 0
+		addi $8, $0, 0x7F	#Load constant to and with
+		and $16, $16, $8
+		addi $19, $0, 30
+		jal drawPipe
+			
+		addi $16, $22, 43
+		addi $8, $0, 0x7F	#Load constant to and with
+		and $16, $16, $8
+		addi $19, $0, 40
+		jal drawPipe
+
+		addi $16, $22, 86
+		addi $8, $0, 0x7F	#Load constant to and with
+		and $16, $16, $8
+		addi $19, $0, 50
+		jal drawPipe
+		
+		add $31, $0, $27
+		jr $31
 
 
 begin:
 
+jal fillColor
+jal drawAllPipe
 jal drawPlayer
 jal delay
+
 
 j begin
 
@@ -111,5 +178,5 @@ j quit
 delayConst:  .word 0x00044240
 vgaStart:  .word 0x40000000
 
-#delayConst: .word 1						#FOR MARS$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#delayConst: .word 1000					#FOR MARS$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #vgaStart: .word 0x10010000				#FOR MARS$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
