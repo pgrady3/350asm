@@ -101,16 +101,27 @@ jr $31
 drawPlayer:
 	add $28, $0, $31		# back up $31
 	
-	lw $8, 0xFFF($0)
-	addi $9, $0, -10
-	and $9, $9, $8
-	add $21, $21, $9
-	addi $20, $8, 0
+	lw $8, 1000($0)
+	blt $8, $0, upBoost
 
-	addi $21, $21, 1		#increase down accel
+	j doneBoost
+upBoost:
+
+doneBoost:
+
+	addi $21, $21, 10		#increase down accel
+
+	addi $8, $0, 200
+	blt $21, $8, skipLowerCap
+	addi $21, $8, 0
+
+skipLowerCap: 
+
 	add $23, $23, $21		#make bird fall
 
-	sra $17, $23, 5			#Set Y to a scaled down version
+	addi $20, $21, 0
+
+	sra $17, $23, 6			#Set Y to a scaled down version
 
 	addi $16, $0, 10		# X coord
 	addi $18, $0, 5		# W
