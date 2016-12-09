@@ -102,10 +102,14 @@ drawPlayer:
 	add $28, $0, $31		# back up $31
 	
 	lw $8, 1000($0)
+	nop
+	nop
+	nop
 	blt $8, $0, upBoost
 
 	j doneBoost
 upBoost:
+	addi $21, $0, -80
 
 doneBoost:
 
@@ -119,7 +123,7 @@ skipLowerCap:
 
 	add $23, $23, $21		#make bird fall
 
-	addi $20, $21, 0
+	
 
 	sra $17, $23, 6			#Set Y to a scaled down version
 
@@ -140,11 +144,11 @@ drawPipe:
 		
 		addi $17, $0, 0
 		addi $18, $0, 10	#CONST, PIPE WIDTH
-		addi $6, $0, 0xFF
+		addi $6, $0, 0x02
 
 		jal drawRect
 		
-		addi $17, $19, 30	#CONST, GAP HEIGHT!!!!!!!!!
+		addi $17, $19, 20	#CONST, GAP HEIGHT!!!!!!!!!
 		addi $19, $0, 127	#Make H 127
 		sub $19, $19, $17	#Subtract gap
 
