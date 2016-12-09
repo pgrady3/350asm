@@ -48,10 +48,9 @@ jr $31
 #Dicks with registers: all the T registers from 8 to 15
 #---------------------------
 drawPixel:
-#lw $9, screenWidth($0)		#Load width into $9
-#mul $9, $9, $26				#Mutiply width * Y
-#add $8, $8, $9				#Add Y offset to $8
-add $8, $19, $25				#Add X offset to $8
+sll $8, $26, 7
+add $8, $8, $25				#Add X offset to $8
+add $8, $8, $19
 sw $27, 0($8)				#Draw the pixel
 
 jr $31
@@ -64,7 +63,7 @@ begin:
 #mul $21, $20, $20
 
 addi $25, $25, 1
-addi $26, $0, 0
+addi $26, $25, 0
 addi $27, $0, 1
 
 jal blankScreen
