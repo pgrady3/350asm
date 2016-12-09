@@ -9,6 +9,9 @@ addi $21, $0, 0	#init bird dY
 addi $23, $0, 1280 #init bird Y
 addi $22, $0, 120	#reset pipes
 addi $20, $0, 0
+addi $24, $0, 50
+addi $25, $0, 80
+addi $26, $0, 60
 
 jal delay		#NEED THIS DONT KNOW WHY
 j begin
@@ -175,7 +178,11 @@ drawAllPipe:
 		and $16, $16, $8
 		addi $19, $24, 0
 
+		#bne $16, $0, endRecalc1
+		#add $24, $24, $20
+		#and $24, $24, $8
 
+	#endRecalc1:
 
 		jal checkGameEnd
 
