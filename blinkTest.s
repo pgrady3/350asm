@@ -64,15 +64,15 @@ jr $31
 begin:
 
 addi $19, $0, 1
-addi $20, $20, 1
+addi $22, $22, 1
 
-addi $21, $20, 0
-addi $22, $20, 0
+addi $21, $19, 0
+addi $20, $19, 0
 addi $23, $19, 0
 addi $24, $19, 0
 jal drawRect
 
-jal delay1S
+#jal delay1S
 
 j begin
 
