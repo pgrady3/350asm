@@ -58,10 +58,6 @@ jr $31
 
 begin:
 
-#lw $9, screenWidth($0)		#Load width into $9
-#addi $20, $20, 1
-#mul $21, $20, $20
-
 addi $25, $25, 1
 addi $26, $25, 0
 addi $27, $0, 1
@@ -70,14 +66,6 @@ jal blankScreen
 jal drawPixel
 jal delay1S
 j begin
-
-#addi $27, $0, 1
-#addi $26, $0, 1
-#addi $25, $25, 1
-
-#jal drawPixel
-
-#jal delay1S
 
 j begin
 
