@@ -76,17 +76,29 @@ addi $31, $30, 0	#Load back the RA
 jr $31
 #FUNCTION END------------------------------------------------
 
+###########################################################################################
+
+drawPlayer:
+	add $28, $0, $31		# back up $31
+	
+	addi $23, $23, 10		# CONST************ make bird fall
+
+	addi $16, $0, 10		# X coord
+	addi $17, $23, 0		# Y
+	addi $18, $0, 10		# W
+	addi $19, $0, 10		# H
+	addi $6, $0, 0xFF		# Color
+
+	jal drawRect
+	
+	add $31, $0, $28
+	jr $31
+
 
 
 begin:
 
-addi $16, $16, 1
-addi $17, $16, 0
-addi $18, $16, 0
-addi $19, $16, 0
-addi $6, $0, 0xFF
-
-jal drawRect
+jal drawPlayer
 jal delay
 
 j begin
@@ -96,7 +108,6 @@ quit:
 j quit
 
 .data
-#delayCont: .word 0x000F4240
 delayConst:  .word 0x00044240
 vgaStart:  .word 0x40000000
 
