@@ -87,12 +87,12 @@ mainGame:
 mainMoveUp:
 			bne, $20, 0x02000000, mainMoveDown
 			lw $5, boost
-			jal addUp		# Up
+			jal moveUp		# Up
 			j mainGameCtd
 
 mainMoveDown:
 			lw $5, gravity
-			jal addDown		# Down
+			jal moveDown		# Down
 
 mainGameCtd:
 
@@ -130,7 +130,7 @@ mainGameCtd:
 			# draw in updated pipes
 			add $4, $0, $17
 			addi $5, $0, 1
-			jal addLeft		# Move rightmost pipe left by 1 unit
+			jal moveLeft		# Move rightmost pipe left by 1 unit
 
 			add $17, $0, $2
 			add $4, $0, $17
@@ -178,7 +178,7 @@ coordToAddr:
 # Function to add a given stage memory address right by a given number of tiles
 # Takes a0 = address, a1 = distance
 # Returns v0 = new address
-addLeft:
+moveLeft:
 		#address -= distance*4
 		add $2, $0, $4			# Move address to $2
 		sll $4, $5, 2			# Multiply distance by 4
@@ -188,7 +188,7 @@ addLeft:
 # Function to add a given stage memory address up by a given number of tiles
 # Takes $4 = address, $5 = distance
 # Returns $2 = new address
-addUp:
+moveUp:
 		#address -= distance*width*4
 		add $2, $0, $4			# Move address to $2
 		lw $4, stageWidth		# Load the screen width into $4
@@ -202,7 +202,7 @@ addUp:
 # Function to add a given stage memory address down by a given number of tiles
 # Takes $4 = address, $5 = distance
 # Returns $2 = new address
-addDown:
+moveDown:
 		#address += distance*width*4
 		add $2, $0, $4			# Similar to MoveUp
 		lw $4, stageWidth		#
