@@ -6,7 +6,7 @@ playerX:		.word 5			# Position of bird
 playerY:		.word 32		# Half of stageHeight
 playerSize:		.word 3			# Dimensions of bird; bird is a square
 
-defaultDir: 		.word 0xFFFF0004
+#defaultDir: 		.word 0xFFFF0004
 gravity: 		.word 1			# Downward force
 boost: 			.word 5			# Upwards force when button is pressed
 pipeWidth: 		.word 6			# Pipe width
@@ -15,7 +15,9 @@ pipeSpace: 		.word 16		# Space between each set of top/bottom pipes
 pipeHeight:   		.word 20		# Pipe height
 
 playerColor:		.word 0x0022CC22	# Store color to draw objects
-bgndColor:		.word 0xFF003300	# Store color to draw background
+#bgndColor:		.word 0xFF003300	# Store color to draw background
+
+vgaStart:  .word 0x40000000
 
 .text
 main:
@@ -23,6 +25,7 @@ main:
 mainInit:
 			# addi $29, $0, 1024	# $sp = 1024
 			# Prepare the arena
+			lw $29, vgaStart($0)
 			lw $4, bgndColor	# Fill stage with background color
 			jal fillColor
 			jal AddBounds		# Add walls
@@ -91,19 +94,19 @@ mainGameCtd:
 mainGameOver:
 			j mainInit
 
-###########################################################################################
-# Get x,y coordinates stored in $4,$5 and draws in color $6
+#FUNCTION drawPixel------------------------------------------
+#Draws the pixel at x = $4, y = $5, color = $6
+#Dicks with registers: all the T registers from 8 to 15
+#---------------------------
 drawPixel:
-		#address = 4*(x + y*width) + gp
-		add $8, $0, $4			# Move x to $8
-		lw $4, stageWidth		#
-		multu $4, $5			# Multiply y by the stage width
-		mflo $4				# Get result of $4*$5
-		addu $8, $8, $4			# Add the result to the x coordinate and store in $2
-		sll $8, $8, 2			# Multiply $2 by 4 bytes
-		add $8, $8, $28			# Add $28 to $2 to give stage memory address
-		sw $6, 0($8)			# color in the pixel
-		jr $31				#
+sll $8, $5, 7
+add $8, $8, $4				#Add X offset to $8
+add $8, $8, $29
+sw $6, 0($8)				#Draw the pixel
+
+jr $31
+#FUNCTION END------------------------------------------------
+		#
 ###########################################################################################
 # Function to retrieve input from the keyboard and return it as an alpha channel direction
 # Takes none
@@ -111,7 +114,7 @@ drawPixel:
 GetDir:
 		addi $8, $0, 0xFFFF0004		# Load input value
 upPressed:
-		bne, $8, 119, GetDir_done
+		bne $8, 119, GetDir_done
 		addi $2, $0, 0x02000000		# Up was pressed
 GetDir_done:
 		jr $31
